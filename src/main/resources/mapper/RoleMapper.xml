@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--映射器xml文件，描述映射关系、SQL等内容-->
+<mapper namespace = "com.wj.mybatis.mapper.RoleMapper">
+    <!-- 对于默认的一级缓存是SqlSession级别的，不同的SqlSession对象不能共享缓存 -->
+    <!-- 为了使SqlSession对象之间共享相同的缓存，需要开启二级缓存如下，此时mybatis会去序列化和反序列化POJO，这就需要POJO实现序列化接口 -->
+    <cache/>
+
+    <!-- resultMap 作用：定义映射规则、级联的更新、定制类型转化器 -->
+    <resultMap id = "roleMap" type = "Role">
+        <!-- id 代表 resultMap 的主键，而 result 代表其属性 -->
+        <id property = "id" column = "id"/>
+        <result property = "roleName" column = "role_name"/>
+        <result property = "note" column = "note"/>
+    </resultMap>
+
+    <sql id = "roleCols">
+        id, role_name, note
+    </sql>
+
+    <select id = "getRoleUseResultMap" parameterType = "long" resultMap = "roleMap">
+        SELECT
+        <include refid = "roleCols"/>
+        FROM t_role
+        WHERE id = #{id}
+    </select>
+
+    <select id = "getRole" parameterType = "long" resultType = "Role">
+        SELECT
+        <include refid = "roleCols"/>
+        FROM t_role
+        WHERE id = #{id}
+    </select>
+
+    <select id = "findRole" parameterType = "string" resultType = "Role">
+        SELECT
+        <include refid = "roleCols"/>
+        FROM t_role
+        WHERE role_name LIKE concat('%', #{roleName}, '%')
+    </select>
+
+    <select id="findRoles" resultType="Role">
+        select <include refid="com.wj.mybatis.mapper.EmployeeMapper.getEmployeeCols"/>
+        from t_employee
+    </select>
+
+    <insert id = "insertRole" parameterType = "role">
+        INSERT INTO t_role (role_name, note) VALUES (#{roleName}, #{note})
+    </insert>
+
+    <!-- 主键回填（仅对 insert 和 update 有用），keyProperty代表将用哪个POJO属性去匹配这个主键 -->
+    <insert id = "insertRoleBackFillGeneratedKey" parameterType = "role"
+            useGeneratedKeys = "true" keyProperty = "id">
+        INSERT INTO t_role (role_name, note) VALUES (#{roleName}, #{note})
+    </insert>
+
+    <delete id = "deleteRole" parameterType = "long">
+        DELETE FROM t_role
+        WHERE id = #{id}
+    </delete>
+
+    <update id = "updateRole" parameterType = "role">
+        UPDATE t_role
+        SET role_name = #{roleName}, note = #{note}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

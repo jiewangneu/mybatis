@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wj.mybatis.mapper.WorkCardMapper">
+
+    <sql id = "workCardCols">
+        id,emp_id,real_name,department,mobile,position,note
+    </sql>
+
+    <select id = "getWorkCardByEmpId" parameterType="long" resultType = "WorkCard">
+        SELECT <include refid = "workCardCols"/>
+        FROM t_work_card
+        WHERE emp_id = #{empId}
+    </select>
+</mapper>

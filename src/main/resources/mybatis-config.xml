@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- MyBatis配置文件 -->
+<configuration>
+
+
+    <!-- 属性 -->
+    <properties resource = "jdbc.properties"/>
+
+    <!-- 设置 -->
+    <settings>
+        <!-- 配置所有映射器的全局缓存开关,默认 true
+            一级缓存：SQL查询记录缓存保存在SqlSession层面，生命周期是同一个SqlSession对象，
+            二级缓存：SQL查询记录缓存保存SqlSessionFactory层面，生命周期是同一个SqlSessionFactory对象，提供给各个SqlSession使用
+            默认系统开启一级缓存（如果没有commit没有一级缓存）
+            当一个SqlSession第一次通过SQL和参数获取对象后，它就会将其缓存起来 -->
+        <setting name = "cacheEnabled" value = "true"/>
+
+        <!-- 关于级联的 -->
+        <!-- 是否开启全局延迟加载，默认 false -->
+        <setting name = "lazyLoadingEnabled" value = "true"/>
+        <!-- 是否采用全局层级加载，默认 false -->
+        <setting name = "aggressiveLazyLoading" value = "false"/>
+
+        <!-- 关于自动映射的 -->
+        <!-- 配置驼峰命名规则，默认 false -->
+        <setting name = "mapUnderscoreToCamelCase" value = "true"/>
+        <!-- 配置映射规则，默认 PARTIAL（自动映射不包括结果集 ResultMap） | NULL（取消自动映射）  | FULL（自动映射，包括结果集 ResultMap） -->
+        <setting name = "autoMappingBehavior" value = "PARTIAL"/>
+
+        <!-- 配置执行器,默认SIMPLE | REUSE（重用预处理语句 prepared statements） | BATCH（重用语句并执行批量更新） -->
+        <setting name = "defaultExecutorType" value = "SIMPLE"/>
+    </settings>
+
+    <!-- 类型命名（别名扫描器，mybatis别名不区分大小写） -->
+    <typeAliases>
+        <package name = "com.wj.mybatis.pojo"/>
+        <package name = "com.wj.mybatis.pojo2"/>
+    </typeAliases>
+
+    <!-- 类型处理器 -->
+    <typeHandlers>
+        <typeHandler javaType="java.lang.Object" handler="com.wj.mybatis.typehandler.SexTypeHandler"/>
+    </typeHandlers>
+
+    <!-- 插件 -->
+    <!--<plugins/>-->
+
+    <!-- 配置环境 -->
+    <environments default = "development">
+        <!-- 环境变量:数据库环境 -->
+        <environment id = "development">
+            <!-- 事务管理器 -->
+            <transactionManager type = "JDBC"/>
+            <!-- 数据源 -->
+            <dataSource type = "POOLED">
+                <property name = "driver" value = "${database.driver}"/>
+                <property name = "url" value = "${database.url}"/>
+                <property name = "username" value = "${database.username}"/>
+                <property name = "password" value = "${database.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 映射器 -->
+    <mappers>
+        <!-- 很奇怪，package,class,url都是映射到java的包下的，但这里mappers不会到java目录下去找xml文件，映射不过去。。 -->
+        <!-- 也就是说目前只能用 resource 方式 -->
+        <mapper resource="mapper/RoleMapper.xml" />
+        <mapper resource="mapper/EmployeeMapper.xml" />
+        <mapper resource="mapper/EmployeeTaskMapper.xml" />
+        <mapper resource="mapper/FemaleHealthFormMapper.xml" />
+        <mapper resource="mapper/MaleHealthFormMapper.xml" />
+        <mapper resource="mapper/RoleMapper.xml" />
+        <mapper resource="mapper/TaskMapper.xml" />
+        <mapper resource="mapper/workCardMapper.xml" />
+    </mappers>
+
+</configuration>

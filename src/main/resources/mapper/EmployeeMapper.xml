@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wj.mybatis.mapper.EmployeeMapper">
+    <!-- 除非必要否则能够接受的最复杂的级联方式就止于此了，再复杂就要商榷其可维护性了 -->
+    <resultMap id="employee" type="Employee">
+        <id column="id" property="id"/>
+        <result column="realName" property="realName"/>
+        <result column="sex" property="sex" typeHandler="com.wj.mybatis.typehandler.SexTypeHandler"/>
+        <result column="birthday" property="birthday"/>
+        <result column="mobile" property="mobile"/>
+        <result column="email" property="email"/>
+        <result column="position" property="position"/>
+        <result column="note" property="note"/>
+        <!-- 一对一级联 -->
+        <association property="workCard" column="id" select="com.wj.mybatis.mapper.WorkCardMapper.getWorkCardByEmpId"/>
+        <!-- 一对多级联，select指向sql，通过column制定的sql字段作为参数进行传递，然后将结果返回给雇员POJO属性employeeTaskList -->
+        <!-- fetchType只在一对一和一对多的情况下有效，设为eager则忽略全局配置项lazyLoadingEnabled和aggressiveLazyLoading -->
+        <collection property="employeeTaskList" column="id" fetchType="eager"
+                    select="com.wj.mybatis.mapper.EmployeeTaskMapper.getEmployeeTaskByEmpId"/>
+        <!-- 鉴别器级联，根据条件决定采用具体实现类级联的方案。column 鉴，case 别，resultMap 决定采用哪个 ResultMap 去映射 -->
+        <discriminator javaType="long" column="sex">
+            <case value="1" resultMap="maleHealthFormMapper"/>
+            <case value="0" resultMap="femaleHealthFormMapper"/>
+        </discriminator>
+    </resultMap>
+
+    <!-- femaleHealthFormMapper通过extends继承id为employee的resultMap -->
+    <resultMap id="femaleHealthFormMapper" type="FemaleEmployee" extends="employee">
+        <association property="femaleHealthForm" column="id" select="com.wj.mybatis.mapper.FemaleHealthFormMapper.getFemaleHealthForm"/>
+    </resultMap>
+
+    <!-- maleHealthFormMapper通过extends继承id为employee的resultMap -->
+    <resultMap id="maleHealthFormMapper" type="MaleEmployee" extends="employee">
+        <association property="maleHealthForm" column="id" select="com.wj.mybatis.mapper.MaleHealthFormMapper.getMaleHealthForm"/>
+    </resultMap>
+
+    <sql id="getEmployeeCols">
+        id, real_name realName, sex, birthday, mobile, email, position, note
+    </sql>
+
+    <select id="getEmployee" parameterType="long" resultMap="employee">
+        SELECT
+        <include refid="getEmployeeCols"/>
+        FROM t_employee
+        WHERE id = #{id}
+    </select>
+
+</mapper>
